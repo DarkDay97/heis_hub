@@ -4,6 +4,7 @@
 static state current_state = INIT_STATE;
 static const int TIME_LIMIT = 3000;
 
+//Function to hold the door open while the stop button is pressed
 void FSM_hold_door(){
     int msec = 0;
     clock_t before = clock();
@@ -16,6 +17,8 @@ void FSM_hold_door(){
     } while (msec < TIME_LIMIT);
 };
 
+
+//The overview of the different states and moving between them
 void FSM_state_machine(){
     switch (current_state)
     {
@@ -28,9 +31,9 @@ void FSM_state_machine(){
         break;
 
     case FLOOR_CLOSED:
-        /* code */
         if(elev_get_stop_signal()){
             current_state = FLOOR_OPEN;
+            elev_set_motor_direction(DIRN_STOP);
         }
         break;
     
@@ -57,7 +60,11 @@ void FSM_state_machine(){
         break;
 
     case TEST:
-    
+        elev_set_motor_direction(DIRN_UP);
+        if(elev_get_floor_sensor_signal()+1){
+            current_state = FLOOR_OPEN;
+            elev_set_motor_direction(DIRN_STOP);
+        }
         break;
         
 
