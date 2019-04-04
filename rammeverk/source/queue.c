@@ -19,10 +19,12 @@ int queue_have_orders(){
 
 
 void queue_add_order(){
-    for(int i = 0, j = 0; i<12; i+=3, j++){
-        orders[i] += elev_get_button_signal(1, j);
-        orders[i+1] += elev_get_button_signal(2, j);
-        orders[i+2] += elev_get_button_signal(0,j);
+    int i;
+    int j;
+    for(i = 0, j = 0; i<12; i+=3, j++){ 
+        if(elev_get_button_signal(BUTTON_CALL_DOWN, j)) {orders[i] = 1;}
+        if(elev_get_button_signal(BUTTON_COMMAND, j)){orders[i+1] = 1;}
+        if(elev_get_button_signal(BUTTON_CALL_UP,j)){orders[i+2] = 1;}
     }
 };
 
@@ -33,6 +35,12 @@ void queue_remove_order(){
     }
     else if (prev_dir == DOWN) {
         orders[1 + current_floor - 1] = 0;
+    }
+}
+
+void queue_remove_all_orders(){
+    for (int i = 0; i < 12; i++){
+        orders[i] = 0;
     }
 }
 

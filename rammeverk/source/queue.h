@@ -15,7 +15,8 @@ typedef enum prev_motor_dir{
 
 
 void queue_add_order(); //Set the number at index to 1
-void queue_remove_order(int index); //Set the number at index to 0;
+void queue_remove_order(); //Set the number at index to 0;
+void queue_remove_all_orders(); //Set all orders to 0;
 
 int queue_get_previous_floor();
 void queue_set_previous_floor();

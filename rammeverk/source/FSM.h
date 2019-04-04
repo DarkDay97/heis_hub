@@ -33,4 +33,8 @@ void FSM_state_machine(); //function for running the state machine
 
 void FSM_hold_door();
 
+void FSM_drive();
+
+void FSM_drive_from_stationary();
+
 #endif
