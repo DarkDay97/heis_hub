@@ -7,12 +7,7 @@ static int prev_floor = -1;
 static int current_floor = -1;
 static prev_motor_dir prev_dir;
 
-//Denne blir unødvendig hvis orders blir global
-int * queue_get_orders(){
-return 0;
-};
 
-//Denne returnerer 0 dersom vi ikke har noen bestillinger. Returnerer 1 - 10 ellers.
 int queue_have_orders(){
     for (int i = 0; i < 12; i++){
         if (orders[i]){
@@ -23,10 +18,17 @@ int queue_have_orders(){
 };
 
 
-
-void queue_add_order(int index){
-    orders[index] = 1;
+void queue_add_order(){
+    for(int i, j = 0; i<12; i+=3, j++){
+        orders[i] += elev_get_button_signal(1, j);
+        orders[i+1] += elev_get_button_signal(2, j);
+        orders[i+2] += elev_get_button_signal(0,j);
+    }
 };
+
+void queue_remove_order(int index){
+    orders[index] = 0;
+}
 
 int queue_get_previous_floor(){
  return prev_floor;
@@ -58,7 +60,7 @@ int queue_get_prev_dir(){
 
 //Returns 1 if it should stop at the next floor. 
 //0 otherwise
-int queue_should_stop_at_floor(int floor, int prev_dir){
+int queue_should_stop_at_floor(int floor){
     if (orders[1+floor*3] | orders[1+floor*3+prev_dir]){
         return 1;
     } 
