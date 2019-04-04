@@ -7,7 +7,7 @@ static int current_floor = -1;
 static int prev_dir; //1 if elevator previously moved upwards, 0 otherwise. 
 
 int * queue_get_orders(){
-
+return 0;
 };
 
 void queue_add_order(int index){
@@ -38,8 +38,8 @@ void queue_set_prev_dir(){
 //Returns 1 if it should stop at the next floor. 
 //0 otherwise
 int queue_should_elev_stop(int floor, int direction){
-    if((current_floor == 0) & (orders[1] | (orders[5] & prev_dir)){
+    if ((current_floor == 0) & (orders[1] | (orders[5] & prev_dir))) {
         return 1;
-        }
     }
-}
+    return 0;
+};

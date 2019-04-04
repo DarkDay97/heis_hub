@@ -9,6 +9,7 @@
 #include "elev.h"
 
 #include <stdlib.h>
+#include <time.h>
 
 
 //The different states of the elevator
@@ -18,7 +19,8 @@ typedef enum elev_state {
     FLOOR_CLOSED,
     FLOOR_OPEN,
     MOVING,
-    STATIONARY
+    STATIONARY,
+    TEST
 } state;
 
 void FSM_init(); //Start-up
@@ -26,5 +28,9 @@ void FSM_init(); //Start-up
 void FSM_changeState(); //Change state
 
 int FSM_getState(); //Get current state
+
+void FSM_state_machine(); //function for running the state machine
+
+void FSM_hold_door();
 
 #endif

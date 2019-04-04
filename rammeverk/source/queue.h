@@ -15,4 +15,6 @@ void queue_set_previous_floor();
 int queue_should_elev_stop(); //1 if it should stop at the current floor. 0 Otherwise
 void queue_set_prev_dir();
 
+void queue_set_current_floor();
+
 #endif
