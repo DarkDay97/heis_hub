@@ -34,12 +34,18 @@ void queue_set_prev_dir(){
     }
 };
 
+int queue_get_prev_dir(){
+    return prev_dir;
+}
+
 
 //Returns 1 if it should stop at the next floor. 
 //0 otherwise
-int queue_should_elev_stop(int floor, int direction){
-    if ((current_floor == 0) & (orders[1] | (orders[5] & prev_dir))) {
+int queue_should_stop_at_floor(int floor, int prev_dir){
+    if (orders[floor*3] | orders[floor*3+prev_dir]){
         return 1;
+    } 
+    else {
+        return 0;
     }
-    return 0;
 };
