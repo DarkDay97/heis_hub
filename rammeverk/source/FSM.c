@@ -31,6 +31,7 @@ void FSM_state_machine(){
         break;
 
     case FLOOR_CLOSED:
+        queue_set_prev_dir(current_state);
         if(elev_get_stop_signal()){
             current_state = FLOOR_OPEN;
             elev_set_motor_direction(DIRN_STOP);
@@ -39,7 +40,7 @@ void FSM_state_machine(){
     
     case FLOOR_OPEN:
         queue_set_current_floor();
-        queue_set_prev_dir();
+        queue_set_prev_dir(current_state);
         FSM_hold_door();
         current_state = FLOOR_CLOSED;
         break;
@@ -48,7 +49,10 @@ void FSM_state_machine(){
         queue_set_previous_floor();
         queue_should_elev_stop();
         if (elev_get_floor_sensor_signal() + 1){
-            current_state = FLOOR_OPEN;
+            if(queue_should_stop_at_floor(elev_get_floor_sensor_signal(), queue_get_prev_dir())){
+                elev_set_motor_direction(DIRN_STOP);
+                current_state = FLOOR_OPEN;
+            }
         }
         else if (elev_get_stop_signal()){
             current_state = STATIONARY;
