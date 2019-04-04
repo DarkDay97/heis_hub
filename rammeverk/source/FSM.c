@@ -66,6 +66,7 @@ void FSM_state_machine(){
             current_state = FLOOR_CLOSED;
             queue_set_current_floor();
             elev_set_motor_direction(DIRN_STOP);
+
         }
         break;
 
@@ -76,6 +77,8 @@ void FSM_state_machine(){
             current_state = MOVING;
             queue_set_previous_floor();
             FSM_drive();
+        } else if (!queue_have_orders()){
+            queue_set_prev_dir(current_state, NONE);
         }
         break;
     

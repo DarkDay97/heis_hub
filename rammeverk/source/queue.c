@@ -58,7 +58,7 @@ void queue_set_current_floor(){
 
 void queue_set_prev_dir(state current_state, prev_motor_dir dir){
     prev_dir = dir;
-    if ((!queue_have_orders()) & (current_state == FLOOR_CLOSED)){
+    if (current_state == FLOOR_CLOSED){
         prev_dir = NONE;
     }
 };
