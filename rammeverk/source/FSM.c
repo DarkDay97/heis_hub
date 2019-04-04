@@ -20,8 +20,10 @@ void FSM_hold_door(){
 void FSM_drive(){
     if (queue_destination() > elev_get_floor_sensor_signal() + 1){
         elev_set_motor_direction(DIRN_UP);
+        queue_set_prev_dir(current_state, UP);
     } else if (queue_destination() < elev_get_floor_sensor_signal()){
         elev_set_motor_direction(DIRN_DOWN);
+        queue_set_prev_dir(current_state, DOWN);
     } else{
         elev_set_motor_direction(DIRN_STOP); //redundant but why not
     }
@@ -31,16 +33,20 @@ void FSM_drive_from_stationary(){
     if (queue_get_prev_dir() == UP){
         if (queue_destination() > queue_get_previous_floor() + 1){
             elev_set_motor_direction(DIRN_UP);
+            queue_set_prev_dir(current_state, UP);
         } else if (queue_destination() <= queue_get_previous_floor() + 1){
             elev_set_motor_direction(DIRN_DOWN);
+            queue_set_prev_dir(current_state, DOWN);
         } else{
             elev_set_motor_direction(DIRN_STOP); //redundant but why not
         }
     } else if (queue_get_prev_dir() == DOWN){
         if (queue_destination() >= queue_get_previous_floor() + 1){
             elev_set_motor_direction(DIRN_UP);
+            queue_set_prev_dir(current_state, UP);
         } else if (queue_destination() < queue_get_previous_floor() + 1){
             elev_set_motor_direction(DIRN_DOWN);
+            queue_set_prev_dir(current_state, DOWN);
         } else{
             elev_set_motor_direction(DIRN_STOP); //redundant but why not
         }
@@ -64,19 +70,17 @@ void FSM_state_machine(){
         break;
 
     case FLOOR_CLOSED:
-        queue_set_prev_dir(current_state);
         if(elev_get_stop_signal()){
             current_state = FLOOR_OPEN;
         } else if (queue_have_orders()){
             current_state = MOVING;
             queue_set_previous_floor();
-            FSM_drive();   
+            FSM_drive();
         }
         break;
     
     case FLOOR_OPEN:
         queue_remove_order();
-        queue_set_prev_dir(current_state);
         FSM_hold_door();
         current_state = FLOOR_CLOSED;
         break;

@@ -56,12 +56,8 @@ void queue_set_current_floor(){
   current_floor = elev_get_floor_sensor_signal();
 };
 
-void queue_set_prev_dir(state current_state){
-    if(current_floor > prev_floor){
-        prev_dir = UP;
-    } else if (current_floor < prev_floor) {
-        prev_dir = DOWN;
-    }
+void queue_set_prev_dir(state current_state, prev_motor_dir dir){
+    prev_dir = dir;
     if ((!queue_have_orders()) & (current_state == FLOOR_CLOSED)){
         prev_dir = NONE;
     }
@@ -75,7 +71,7 @@ prev_motor_dir queue_get_prev_dir(){
 //Returns 1 if it should stop at the next floor. 
 //0 otherwise
 int queue_should_stop_at_floor(int floor){
-    if (orders[1+floor*3] | orders[1+floor*3+prev_dir]){
+    if ((orders[1+floor*3]) | (orders[1+floor*3+prev_dir])){
         return 1;
     } 
     else {
