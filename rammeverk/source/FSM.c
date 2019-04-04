@@ -47,9 +47,9 @@ void FSM_state_machine(){
 
     case MOVING:
         queue_set_previous_floor();
-        queue_should_elev_stop();
+        queue_should_stop_at_floor(elev_get_floor_sensor_signal());
         if (elev_get_floor_sensor_signal() + 1){
-            if(queue_should_stop_at_floor(elev_get_floor_sensor_signal(), queue_get_prev_dir())){
+            if(queue_should_stop_at_floor(elev_get_floor_sensor_signal())){
                 elev_set_motor_direction(DIRN_STOP);
                 current_state = FLOOR_OPEN;
             }

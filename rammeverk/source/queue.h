@@ -2,6 +2,8 @@
 #define QUEUE_H__
 
 #include "elev.h"
+#include "FSM.h"
+
 #include <stdio.h>
 #include <assert.h>
 

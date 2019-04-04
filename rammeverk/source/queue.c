@@ -1,5 +1,5 @@
 #include "queue.h"
-#include "FSM.h"
+
 
 static int orders[12] = {0};
 
@@ -13,21 +13,27 @@ int queue_have_orders(){
         if (orders[i]){
             return 1;
         }
-    return 0;
     }
+    return 0;
 };
 
 
 void queue_add_order(){
-    for(int i, j = 0; i<12; i+=3, j++){
+    for(int i = 0, j = 0; i<12; i+=3, j++){
         orders[i] += elev_get_button_signal(1, j);
         orders[i+1] += elev_get_button_signal(2, j);
         orders[i+2] += elev_get_button_signal(0,j);
     }
 };
 
-void queue_remove_order(int index){
-    orders[index] = 0;
+void queue_remove_order(){
+    orders[1 + current_floor*3] = 0;
+    if (prev_dir == UP){
+        orders[1 + current_floor*3 + 1] = 0;
+    }
+    else if (prev_dir == DOWN) {
+        orders[1 + current_floor - 1] = 0;
+    }
 }
 
 int queue_get_previous_floor(){
@@ -48,12 +54,12 @@ void queue_set_prev_dir(state current_state){
     } else if (current_floor < prev_floor) {
         prev_dir = DOWN;
     }
-    if (!queue_have_orders() & current_state == FLOOR_CLOSED){
+    if ((!queue_have_orders()) & (current_state == FLOOR_CLOSED)){
         prev_dir = NONE;
     }
 };
 
-int queue_get_prev_dir(){
+prev_motor_dir queue_get_prev_dir(){
     return prev_dir;
 }
 
