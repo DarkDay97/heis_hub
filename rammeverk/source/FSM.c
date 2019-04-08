@@ -1,24 +1,14 @@
 #include "FSM.h"
 #include "queue.h"
+#include "timer.h"
+#include "lights.h"
 
-static state current_state = INIT_STATE;
-static const int TIME_LIMIT = 3000;
+state current_state = INIT_STATE;
 
 //Function to hold the door open while the stop button is pressed
-void FSM_hold_door(){
-    int msec = 0;
-    clock_t before = clock();
-    do {
-        clock_t difference = clock() - before;
-        msec = difference * 1000 / CLOCKS_PER_SEC;
-        if (elev_get_stop_signal()) {
-            msec = 0;
-        }
-    } while (msec < TIME_LIMIT);
-};
 
 void FSM_drive(){
-    if (queue_destination() > elev_get_floor_sensor_signal() + 1){
+    if (queue_destination() > (elev_get_floor_sensor_signal() + 1)){
         elev_set_motor_direction(DIRN_UP);
         queue_set_prev_dir(current_state, UP);
     } else if (queue_destination() < elev_get_floor_sensor_signal()){
@@ -31,20 +21,20 @@ void FSM_drive(){
 
 void FSM_drive_from_stationary(){
     if (queue_get_prev_dir() == UP){
-        if (queue_destination() > queue_get_previous_floor() + 1){
+        if (queue_destination() > (queue_get_previous_floor() + 1)){
             elev_set_motor_direction(DIRN_UP);
             queue_set_prev_dir(current_state, UP);
-        } else if (queue_destination() <= queue_get_previous_floor() + 1){
+        } else if (queue_destination() <= (queue_get_previous_floor() + 1)){
             elev_set_motor_direction(DIRN_DOWN);
             queue_set_prev_dir(current_state, DOWN);
         } else{
             elev_set_motor_direction(DIRN_STOP); //redundant but why not
         }
     } else if (queue_get_prev_dir() == DOWN){
-        if (queue_destination() >= queue_get_previous_floor() + 1){
+        if (queue_destination() >= (queue_get_previous_floor() + 1)){
             elev_set_motor_direction(DIRN_UP);
             queue_set_prev_dir(current_state, UP);
-        } else if (queue_destination() < queue_get_previous_floor() + 1){
+        } else if (queue_destination() < (queue_get_previous_floor() + 1)){
             elev_set_motor_direction(DIRN_DOWN);
             queue_set_prev_dir(current_state, DOWN);
         } else{
@@ -62,10 +52,12 @@ void FSM_state_machine(){
     {
     case INIT_STATE:
         elev_set_motor_direction(DIRN_DOWN);
+        queue_remove_all_orders();
         if (elev_get_floor_sensor_signal() == 0){
             current_state = FLOOR_CLOSED;
             queue_set_current_floor();
             elev_set_motor_direction(DIRN_STOP);
+            timer_init();
 
         }
         break;
@@ -75,8 +67,8 @@ void FSM_state_machine(){
             current_state = FLOOR_OPEN;
         } else if (queue_have_orders()){
             current_state = MOVING;
-            queue_set_previous_floor();
             FSM_drive();
+            queue_set_previous_floor();
         } else if (!queue_have_orders()){
             queue_set_prev_dir(current_state, NONE);
         }
@@ -84,16 +76,26 @@ void FSM_state_machine(){
     
     case FLOOR_OPEN:
         queue_remove_order();
-        FSM_hold_door();
-        current_state = FLOOR_CLOSED;
+        
+        if(timer_is_timeout()){
+            current_state = FLOOR_CLOSED;
+        }
+        else if (elev_get_stop_signal()){
+            timer_reset();
+        }
         break;
 
     case MOVING:
-        if (elev_get_floor_sensor_signal() + 1){
+        if ((elev_get_floor_sensor_signal() + 1)){
             if(queue_should_stop_at_floor(elev_get_floor_sensor_signal())){
                 elev_set_motor_direction(DIRN_STOP);
                 queue_set_current_floor();
+                lights_set_floor_indicator();
+                timer_reset();
                 current_state = FLOOR_OPEN;
+                if((elev_get_floor_sensor_signal() == 0) | (elev_get_floor_sensor_signal() == 3)){
+                    queue_set_prev_dir(current_state ,NONE);
+                }
             }
         }
         else if (elev_get_stop_signal()){
@@ -112,14 +114,14 @@ void FSM_state_machine(){
         }
         break;
 
-    case TEST:
+   /* case TEST:
         elev_set_motor_direction(DIRN_UP);
         if(elev_get_floor_sensor_signal()+1){
             current_state = FLOOR_OPEN;
             elev_set_motor_direction(DIRN_STOP);
         }
         break;
-        
+     */   
 
     default:
         break;

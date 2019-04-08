@@ -20,6 +20,7 @@ void queue_remove_all_orders(); //Set all orders to 0;
 
 int queue_get_previous_floor();
 void queue_set_previous_floor();
+int queue_get_current_floor();
 
 int queue_should_stop_at_floor(int floor); //1 if it should stop at the current floor. 0 Otherwise
 void queue_set_prev_dir(state current_state, prev_motor_dir dir);

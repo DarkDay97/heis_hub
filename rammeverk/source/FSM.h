@@ -9,7 +9,6 @@
 #include "elev.h"
 
 #include <stdlib.h>
-#include <time.h>
 
 
 //The different states of the elevator
@@ -30,8 +29,6 @@ void FSM_changeState(); //Change state
 int FSM_getState(); //Get current state
 
 void FSM_state_machine(); //function for running the state machine
-
-void FSM_hold_door();
 
 void FSM_drive();
 

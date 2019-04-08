@@ -15,7 +15,7 @@ int queue_have_orders(){
         }
     }
     return 0;
-};
+}
 
 
 void queue_add_order(){
@@ -26,7 +26,7 @@ void queue_add_order(){
         if(elev_get_button_signal(BUTTON_COMMAND, j)){orders[i+1] = 1;}
         if(elev_get_button_signal(BUTTON_CALL_UP,j)){orders[i+2] = 1;}
     }
-};
+}
 
 void queue_remove_order(){
     orders[1 + current_floor*3] = 0;
@@ -44,24 +44,23 @@ void queue_remove_all_orders(){
     }
 }
 
-int queue_get_previous_floor(){
- return prev_floor;
-};
+int queue_get_previous_floor(){return prev_floor;}
 
-void queue_set_previous_floor(){
-  prev_floor = current_floor;
-};
+void queue_set_previous_floor(){prev_floor = current_floor;}
+
+int queue_get_current_floor(){return current_floor;}
+
 
 void queue_set_current_floor(){
   current_floor = elev_get_floor_sensor_signal();
-};
+}
 
 void queue_set_prev_dir(state current_state, prev_motor_dir dir){
     prev_dir = dir;
     if (current_state == FLOOR_CLOSED){
         prev_dir = NONE;
     }
-};
+}
 
 prev_motor_dir queue_get_prev_dir(){
     return prev_dir;
@@ -71,16 +70,22 @@ prev_motor_dir queue_get_prev_dir(){
 //Returns 1 if it should stop at the next floor. 
 //0 otherwise
 int queue_should_stop_at_floor(int floor){
-    if ((orders[1+floor*3]) | (orders[1+floor*3+prev_dir])){
+    if(floor < 0){
+        return 0;
+    }
+    if (((floor == 0) & (orders[2]))|((floor == 3) & (orders[9]))){
         return 1;
-    } 
+    }
+    else if ((orders[1+floor*3]) | (orders[1+floor*3+prev_dir])){
+        return 1;
+    }
     else {
         return 0;
     }
 };
 
 int queue_destination(){
-    static int destination;
+    int destination = -1;
     if (prev_dir == UP){
         if (orders[9] | orders[10]){
             destination = 4;
